@@ -4,22 +4,115 @@
   "description": "Script para detetar colisões",
   "settingsSchema": {
     "display": "form",
+    "settings": {
+      "pdf": {
+        "id": "1ec0f8ee-6685-5d98-a847-26f67b67d6f0",
+        "src": "https://files.form.io/pdf/5692b91fd1028f01000407e3/file/1ec0f8ee-6685-5d98-a847-26f67b67d6f0"
+      }
+    },
     "components": [
       {
-        "label": "Nome",
-        "description": "Nome para saludar",
-        "tableView": true,
-        "key": "nome",
-        "type": "textfield",
+        "label": "Quantidade de mensagens para considerar",
+        "tooltip": "O sensor cria eventos continuamente. Só considerar os X ultimos eventos do sensor para decidir se o evento foi uma colisão ou não.",
+        "mask": false,
+        "tableView": false,
+        "defaultValue": 25,
+        "delimiter": false,
+        "requireDecimal": false,
+        "inputFormat": "plain",
+        "truncateMultipleSpaces": false,
+        "validate": {
+          "required": true
+        },
+        "key": "maxSamples",
+        "type": "number",
+        "input": true
+      },
+      {
+        "label": "Tempo mínimo entre leituras do sensor",
+        "tooltip": "As vezes o sensor detecta muitas leituras rapidamente. Só considerar as leituras que tiver pelo menos X milisegundos entre cada uma.",
+        "suffix": "milisegundos",
+        "mask": false,
+        "tableView": false,
+        "defaultValue": 20,
+        "delimiter": false,
+        "requireDecimal": false,
+        "inputFormat": "plain",
+        "truncateMultipleSpaces": false,
+        "validate": {
+          "required": true
+        },
+        "key": "minTimeBetweenSamplesMs",
+        "type": "number",
+        "input": true
+      },
+      {
+        "label": "Tempo da janela",
+        "tooltip": "Desde a leitura atual quantos milisegundos são o límite até ser considerados dados atuais?\n\nValores com mais tempo desse vão ser desconsiderados.",
+        "prefix": "milisegundos",
+        "mask": false,
+        "tableView": false,
+        "defaultValue": 500,
+        "delimiter": false,
+        "requireDecimal": false,
+        "inputFormat": "plain",
+        "truncateMultipleSpaces": false,
+        "validate": {
+          "required": true
+        },
+        "key": "visibleTimeRangeMs",
+        "type": "number",
+        "input": true
+      },
+      {
+        "label": "Porcentagem de magnitude",
+        "tooltip": "Dadas as leituras atuais, quantas (%) deveriam ficar acima do valor base?",
+        "mask": false,
+        "tableView": false,
+        "defaultValue": 25,
+        "delimiter": false,
+        "requireDecimal": false,
+        "inputFormat": "plain",
+        "truncateMultipleSpaces": false,
+        "validate": {
+          "required": true
+        },
+        "key": "magnitudeThreshold",
+        "type": "number",
+        "input": true
+      },
+      {
+        "label": "Porcentagem acima da meia para colisão",
+        "tooltip": "Qual porcentagem deveria ficar acima da meia para que o evento seja considerado uma colisão?",
+        "mask": false,
+        "tableView": false,
+        "defaultValue": 66,
+        "delimiter": false,
+        "requireDecimal": false,
+        "inputFormat": "plain",
+        "truncateMultipleSpaces": false,
+        "validate": {
+          "required": true,
+          "min": 0,
+          "max": 100
+        },
+        "key": "percentOverThresholdForShake",
+        "type": "number",
+        "input": true
+      },
+      {
+        "label": "Bloquear maquina ao tiver um evento de colisão?",
+        "tableView": false,
+        "key": "lockOnCollision",
+        "type": "checkbox",
         "input": true,
-        "defaultValue": "User"
+        "defaultValue": false
       },
       {
         "type": "button",
         "label": "Submit",
         "key": "submit",
         "disableOnInvalid": true,
-        "block": true,
         "input": true,
         "tableView": false
       }
