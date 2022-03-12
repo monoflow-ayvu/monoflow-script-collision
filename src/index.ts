@@ -28,17 +28,17 @@ messages.on('onInit', function() {
   env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', conf.get('visibleTimeRangeMs', 500));
   env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', conf.get('magnitudeThreshold', 25));
   env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
-
-  MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
-    platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold}%`);
-    env.project?.saveEvent(ev);
-
-    if (conf.get('lockOnCollision', false)) {
-      platform.log('locking device');
-      MonoUtils.storage.set(IS_DEVICE_LOCKED_KEY, true);
-      MonoUtils.wk.lock.lock();
-      env.project.logout();
-    }
-  });
 });
 
+
+MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
+  platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold}%`);
+  env.project?.saveEvent(ev);
+
+  if (conf.get('lockOnCollision', false)) {
+    platform.log('locking device');
+    MonoUtils.storage.set(IS_DEVICE_LOCKED_KEY, true);
+    MonoUtils.wk.lock.lock();
+    env.project.logout();
+  }
+});
