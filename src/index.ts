@@ -32,7 +32,7 @@ messages.on('onInit', function() {
 
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
-  platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold}%`);
+  platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold * 100}%`);
   env.project?.saveEvent(ev);
 
   if (conf.get('lockOnCollision', false)) {
