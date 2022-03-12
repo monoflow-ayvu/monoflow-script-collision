@@ -49,7 +49,7 @@
       {
         "label": "Tempo da janela",
         "tooltip": "Desde a leitura atual quantos milisegundos são o límite até ser considerados dados atuais?\n\nValores com mais tempo desse vão ser desconsiderados.",
-        "prefix": "milisegundos",
+        "suffix": "milisegundos",
         "mask": false,
         "tableView": false,
         "defaultValue": 500,
