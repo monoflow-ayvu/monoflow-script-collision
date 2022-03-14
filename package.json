@@ -1,6 +1,6 @@
 {
   "name": "collision",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Script para detetar colisões",
   "settingsSchema": {
     "display": "form",
