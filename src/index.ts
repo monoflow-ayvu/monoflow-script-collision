@@ -1,7 +1,7 @@
 import * as MonoUtils from "@fermuch/monoutils";
 
 // based on settingsSchema @ package.json
-type Config = {
+export type Config = {
   maxSamples: number;
   minTimeBetweenSamplesMs: number;
   visibleTimeRangeMs: number;
