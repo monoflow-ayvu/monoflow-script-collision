@@ -88,7 +88,12 @@ describe("onInit", () => {
     
     expect(MonoUtils.storage.getBoolean('IS_DEVICE_LOCKED')).toBe(true);
     expect(MonoUtils.wk.lock.getLockState()).toBe(true);
-    expect(env.project.saveEvent).toHaveBeenCalledTimes(1);
+    expect(env.project.saveEvent).toHaveBeenCalledTimes(2);
     expect(env.project.logout).toHaveBeenCalledTimes(1);
+
+    const eventCall = (env.project.saveEvent as jest.Mock).mock.calls[1][0];
+    expect(eventCall.kind).toBe('critical-lock');
+    expect(eventCall.getData().locked).toBe(true);
+    expect(eventCall.getData().unlocked).toBe(false);
   });
 });

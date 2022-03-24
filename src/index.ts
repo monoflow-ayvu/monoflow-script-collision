@@ -13,6 +13,22 @@ export type Config = {
 const conf = new MonoUtils.config.Config<Config>();
 const IS_DEVICE_LOCKED_KEY = 'IS_DEVICE_LOCKED' as const;
 
+class LockEvent extends MonoUtils.wk.event.BaseEvent {
+  kind = 'critical-lock' as const;
+
+  constructor(public readonly isLocked: boolean) {
+    super();
+  }
+
+  getData() {
+    return {
+      locked: this.isLocked,
+      unlocked: !this.isLocked,
+      isLocked: this.isLocked,
+    };
+  }
+}
+
 declare class ShakeEvent extends MonoUtils.wk.event.BaseEvent {
   kind: 'shake-event';
   getData(): {percentOverThreshold: number};
@@ -39,6 +55,7 @@ MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
     platform.log('locking device');
     MonoUtils.storage.set(IS_DEVICE_LOCKED_KEY, true);
     MonoUtils.wk.lock.lock();
+    env.project.saveEvent(new LockEvent(true));
     env.project.logout();
   }
 });
