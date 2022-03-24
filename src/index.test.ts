@@ -96,4 +96,59 @@ describe("onInit", () => {
     expect(eventCall.getData().locked).toBe(true);
     expect(eventCall.getData().unlocked).toBe(false);
   });
+
+  it('generates an alert on the device if alertOnCollision is true', () => {
+    (env.project as any) = {
+      saveEvent: jest.fn(),
+      logout: jest.fn()
+    };
+    platform.setUrgentNotification = jest.fn();
+    platform.wakeup = jest.fn();
+
+    getSettings = () => ({
+      alertOnCollision: true,
+    });
+
+    loadScript();
+    messages.emit('onInit');
+
+    expect(platform.setUrgentNotification).toHaveBeenCalledTimes(0);
+    expect(platform.wakeup).toHaveBeenCalledTimes(0);
+    messages.emit('onEvent', new MockShakeEvent());
+    
+    expect(platform.setUrgentNotification).toHaveBeenCalledTimes(1);
+    expect(platform.wakeup).toHaveBeenCalled();
+
+    const call = (platform.setUrgentNotification as jest.Mock).mock.calls[0][0];
+    expect(call.title).toBe('COLISÃO');
+  });
+
+  it('unlocks when receiving action "ok" on onCall', () => {
+    (env.project as any) = {
+      saveEvent: jest.fn(),
+      logout: jest.fn()
+    };
+    platform.setUrgentNotification = jest.fn();
+    platform.wakeup = jest.fn();
+
+    getSettings = () => ({
+      alertOnCollision: true,
+    });
+
+    loadScript();
+    messages.emit('onInit');
+
+    expect(platform.setUrgentNotification).toHaveBeenCalledTimes(0);
+    expect(platform.wakeup).toHaveBeenCalledTimes(0);
+    messages.emit('onEvent', new MockShakeEvent());
+    
+    expect(platform.setUrgentNotification).toHaveBeenCalledTimes(1);
+    expect(platform.wakeup).toHaveBeenCalled();
+
+    const call = (platform.setUrgentNotification as jest.Mock).mock.calls[0][0];
+    expect(call.title).toBe('COLISÃO');
+
+    messages.emit('onCall', 'ok', {});
+    expect(platform.setUrgentNotification).toBeCalledWith(null);
+  })
 });

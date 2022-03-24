@@ -109,6 +109,14 @@
         "defaultValue": false
       },
       {
+        "label": "Acordar o telefone e gerar um alarme visual?",
+        "tableView": false,
+        "key": "alertOnCollision",
+        "type": "checkbox",
+        "input": true,
+        "defaultValue": false
+      },
+      {
         "type": "button",
         "label": "Submit",
         "key": "submit",

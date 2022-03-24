@@ -8,6 +8,7 @@ export type Config = {
   magnitudeThreshold: number;
   percentOverThresholdForShake: number;
   lockOnCollision: boolean;
+  alertOnCollision: boolean;
 }
 
 const conf = new MonoUtils.config.Config<Config>();
@@ -31,10 +32,50 @@ class LockEvent extends MonoUtils.wk.event.BaseEvent {
 
 declare class ShakeEvent extends MonoUtils.wk.event.BaseEvent {
   kind: 'shake-event';
-  getData(): {percentOverThreshold: number};
+  getData(): { percentOverThreshold: number };
 }
 
-messages.on('onInit', function() {
+function wakeup() {
+  if ('wakeup' in platform) {
+    (platform as unknown as { wakeup: () => void }).wakeup();
+  }
+}
+
+interface Action {
+  name: string;
+  action: string;
+  payload: unknown;
+}
+
+type UrgentNotification = {
+  title: string;
+  message?: string;
+  color?: string;
+  actions?: Action[];
+  urgent?: boolean;
+} | null;
+
+function setUrgentNotification(notification: UrgentNotification) {
+  // platform.log('setUrgentNotification', notification);
+  if (!('setUrgentNotification' in platform)) {
+    return;
+  }
+
+  if (notification !== null) {
+    wakeup();
+  }
+  (platform as unknown as { setUrgentNotification: (notification: UrgentNotification) => void }).setUrgentNotification(notification);
+}
+
+function getUrgentNotification(): UrgentNotification | null {
+  if (!('getUrgentNotification' in platform)) {
+    return null;
+  }
+
+  return (platform as unknown as { getUrgentNotification: () => UrgentNotification | null }).getUrgentNotification();
+}
+
+messages.on('onInit', function () {
   platform.log('collision script started');
   platform.log('settings:');
   platform.log(conf.store);
@@ -45,7 +86,6 @@ messages.on('onInit', function() {
   env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', conf.get('magnitudeThreshold', 25));
   env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
 });
-
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
   platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold * 100}%`);
@@ -58,4 +98,26 @@ MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
     env.project.saveEvent(new LockEvent(true));
     env.project.logout();
   }
+
+  if (conf.get('alertOnCollision', false)) {
+    wakeup();
+    setUrgentNotification({
+      title: 'COLISÃO',
+      message: 'O dispositivo teve uma colisão',
+      color: '#fa4023',
+      actions: [{
+        name: 'OK',
+        action: 'ok',
+        payload: {},
+      }],
+      urgent: true,
+    });
+    wakeup();
+  }
 });
+
+messages.on('onCall', (name: string, args: unknown) => {
+  if (name === 'ok') {
+    setUrgentNotification(null);
+  }
+})
