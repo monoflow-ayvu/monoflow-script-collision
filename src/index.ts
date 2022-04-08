@@ -105,6 +105,7 @@ MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
 
     if (!anyValid) {
       platform.log('audio detector: no valid classifications detected');
+      platform.log('[debug] classifications: ' + JSON.stringify(eventClasses));
       return;
     }
   }
