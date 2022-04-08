@@ -11,7 +11,14 @@ function loadScript() {
 class MockShakeEvent extends MonoUtils.wk.event.BaseEvent {
   kind = 'shake-event' as const;
   getData() {
-    return {percentOverThreshold: 0.5};
+    return {
+      percentOverThreshold: 0.5,
+      classifications: {
+        classification1: 0.5,
+        classification2: 0.5,
+        classification3: 0.5,
+      }
+    };
   };
 }
 
@@ -53,6 +60,7 @@ describe("onInit", () => {
     expect(env.data.ACCELEROMETER_VISIBLE_TIME_RANGE_MS).toBe(3);
     expect(env.data.ACCELEROMETER_MAGNITUDE_THRESHOLD).toBe(4);
     expect(env.data.ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE).toBe(5);
+    expect(env.data.ACCELEROMETER_USE_AUDIO_DETECTOR).toBe(false);
   });
 
   it('stores event on shake-event', () => {
@@ -150,5 +158,98 @@ describe("onInit", () => {
 
     messages.emit('onCall', 'ok', {});
     expect(platform.setUrgentNotification).toBeCalledWith(null);
-  })
+  });
+
+  describe('enableAudio=true', () => {
+    it('does not trigger if no filter matches', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+      };
+      getSettings = () => ({
+        enableAudio: true,
+        filters: [{
+          category: 'classification999999',
+          minimum: 50,
+        }],
+      });
+      loadScript();
+
+      messages.emit('onEvent', new MockShakeEvent());
+      expect(env.project.saveEvent).toHaveBeenCalledTimes(0);
+    });
+
+    it('triggers if at least one filter matches', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+      };
+      getSettings = () => ({
+        enableAudio: true,
+        filters: [{
+          category: 'classification1',
+          minimum: 50,
+        }],
+      });
+      loadScript();
+
+      messages.emit('onEvent', new MockShakeEvent());
+      expect(env.project.saveEvent).toHaveBeenCalledTimes(1);
+    });
+
+    it('triggers if more than one matches too', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+      };
+      getSettings = () => ({
+        enableAudio: true,
+        filters: [{
+          category: 'classification1',
+          minimum: 50,
+        }, {
+          category: 'classification2',
+          minimum: 50,
+        }],
+      });
+      loadScript();
+
+      messages.emit('onEvent', new MockShakeEvent());
+      expect(env.project.saveEvent).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not trigger if required level is higher than provided level', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+      };
+      getSettings = () => ({
+        enableAudio: true,
+        filters: [{
+          category: 'classification1',
+          minimum: 90,
+        }],
+      });
+      loadScript();
+
+      messages.emit('onEvent', new MockShakeEvent());
+      expect(env.project.saveEvent).toHaveBeenCalledTimes(0);
+    });
+
+    it('does trigger if at least one level is at the correct level', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+      };
+      getSettings = () => ({
+        enableAudio: true,
+        filters: [{
+          category: 'classification1',
+          minimum: 50,
+        }, {
+          category: 'classification2',
+          minimum: 90,
+        }],
+      });
+      loadScript();
+
+      messages.emit('onEvent', new MockShakeEvent());
+      expect(env.project.saveEvent).toHaveBeenCalledTimes(1);
+    })
+  });
 });

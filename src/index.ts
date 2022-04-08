@@ -9,6 +9,12 @@ export type Config = {
   percentOverThresholdForShake: number;
   lockOnCollision: boolean;
   alertOnCollision: boolean;
+
+  enableAudio: boolean;
+  filters: {
+    category: string;
+    minimum: number;
+  }[]
 }
 
 const conf = new MonoUtils.config.Config<Config>();
@@ -32,7 +38,7 @@ class LockEvent extends MonoUtils.wk.event.BaseEvent {
 
 declare class ShakeEvent extends MonoUtils.wk.event.BaseEvent {
   kind: 'shake-event';
-  getData(): { percentOverThreshold: number };
+  getData(): { percentOverThreshold: number, classifications: Record<string, number> };
 }
 
 function wakeup() {
@@ -56,7 +62,6 @@ type UrgentNotification = {
 } | null;
 
 function setUrgentNotification(notification: UrgentNotification) {
-  // platform.log('setUrgentNotification', notification);
   if (!('setUrgentNotification' in platform)) {
     return;
   }
@@ -85,9 +90,25 @@ messages.on('onInit', function () {
   env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', conf.get('visibleTimeRangeMs', 500));
   env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', conf.get('magnitudeThreshold', 25));
   env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
+  env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', Boolean(conf.get('enableAudio', false)));
 });
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
+  if (conf.get('enableAudio', false)) {
+    const eventClasses = ev.getData().classifications || {};
+    let anyValid = false;
+    for (const confClass of conf.get('filters', [])) {
+      if (((eventClasses[confClass.category] || 0) * 100) >= confClass.minimum) {
+        anyValid = true;
+      }
+    }
+
+    if (!anyValid) {
+      platform.log('audio detector: no valid classifications detected');
+      return;
+    }
+  }
+
   platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold * 100}%`);
   env.project?.saveEvent(ev);
 
