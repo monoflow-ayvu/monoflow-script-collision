@@ -111,7 +111,7 @@ MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
     }
   }
 
-  const classificationLog = anyValid ? `with classification ${anyValid}=${eventClasses[anyValid] * 100}%` : '';
+  const classificationLog = anyValid ? `with classification "${anyValid}"=${eventClasses[anyValid] * 100}%` : '';
   platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold * 100}% ${classificationLog}`);
   env.project?.saveEvent(ev);
 
