@@ -125,6 +125,29 @@
         "input": true
       },
       {
+        "label": "Quantidade de keywords para considerar colisão",
+        "tooltip": "Quantidade total de keywords para considerar colisão. Só quando tiver X keywords, o evento será considerado uma colisão.",
+        "mask": false,
+        "tableView": false,
+        "defaultValue": 1,
+        "delimiter": false,
+        "requireDecimal": false,
+        "inputFormat": "plain",
+        "truncateMultipleSpaces": false,
+        "conditional": {
+          "show": true,
+          "when": "enableAudio",
+          "eq": "true"
+        },
+        "validate": {
+          "required": true,
+          "min": 1
+        },
+        "key": "totalSoundKeywords",
+        "type": "number",
+        "input": true
+      },
+      {
         "label": "Filters",
         "reorder": false,
         "addAnotherPosition": "bottom",

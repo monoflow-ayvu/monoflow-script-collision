@@ -11,6 +11,7 @@ export type Config = {
   alertOnCollision: boolean;
 
   enableAudio: boolean;
+  totalSoundKeywords: number;
   filters: {
     category: string;
     minimum: number;
@@ -95,24 +96,28 @@ messages.on('onInit', function () {
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
   const eventClasses = ev.getData().classifications || {};
-  
-  let anyValid: false | string = false;
+
+  let validations: {category: string; level: number}[] = [];
   if (conf.get('enableAudio', false)) {
     for (const confClass of conf.get('filters', [])) {
       if (((eventClasses[confClass.category] || 0) * 100) >= confClass.minimum) {
-        anyValid = confClass.category || 'unknown';
+        validations.push({
+          category: confClass.category,
+          level: eventClasses[confClass.category] || 0,
+        });
       }
     }
 
-    if (anyValid === false) {
-      platform.log('audio detector: no valid classifications detected');
+    const minimumNeeded = conf.get('totalSoundKeywords', 1);
+    if (validations.length < minimumNeeded) {
+      platform.log(`audio detector: no valid classifications detected (need ${minimumNeeded}, got ${validations.length})`);
       platform.log('[debug] classifications: ' + JSON.stringify(eventClasses));
       return;
     }
   }
 
-  const classificationLog = anyValid ? `with classification "${anyValid}"=${eventClasses[anyValid] * 100}%` : '';
-  platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold * 100}% ${classificationLog}`);
+  // print log of magnitude and the classifications validated
+  platform.log(`detected shake event of magnitude: ${ev.getData().percentOverThreshold}%`, validations);
   env.project?.saveEvent(ev);
 
   if (conf.get('lockOnCollision', false)) {
