@@ -250,6 +250,8 @@ describe("onInit", () => {
 
       messages.emit('onEvent', new MockShakeEvent());
       expect(env.project.saveEvent).toHaveBeenCalledTimes(1);
-    })
+    });
+
+    xit('only triggers when totalSoundKeywords is met', () => {});
   });
 });
