@@ -94,23 +94,25 @@ messages.on('onInit', function () {
 });
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
+  const eventClasses = ev.getData().classifications || {};
+  
+  let anyValid: false | string = false;
   if (conf.get('enableAudio', false)) {
-    const eventClasses = ev.getData().classifications || {};
-    let anyValid = false;
     for (const confClass of conf.get('filters', [])) {
       if (((eventClasses[confClass.category] || 0) * 100) >= confClass.minimum) {
-        anyValid = true;
+        anyValid = confClass.category || 'unknown';
       }
     }
 
-    if (!anyValid) {
+    if (anyValid === false) {
       platform.log('audio detector: no valid classifications detected');
       platform.log('[debug] classifications: ' + JSON.stringify(eventClasses));
       return;
     }
   }
 
-  platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold * 100}%`);
+  const classificationLog = anyValid ? `with classification ${anyValid}=${eventClasses[anyValid] * 100}%` : '';
+  platform.log(`detected shake event of magnitude ${ev.getData()?.percentOverThreshold * 100}% ${classificationLog}`);
   env.project?.saveEvent(ev);
 
   if (conf.get('lockOnCollision', false)) {
