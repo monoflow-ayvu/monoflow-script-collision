@@ -254,4 +254,128 @@ describe("onInit", () => {
 
     xit('only triggers when totalSoundKeywords is met', () => {});
   });
+
+  describe('onlyTagsCanDisable=true', () => {
+    it('dismisses notification if user has tags that match', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+        logout: jest.fn(),
+        currentLogin: {
+          maybeCurrent: {
+            $modelId: 'TEST',
+            tags: ['tag1', 'tag2']
+          }
+        },
+        logins: [{
+          $modelId: 'TEST',
+          tags: ['tag1', 'tag2']
+        }]
+      };
+      platform.setUrgentNotification = jest.fn();
+      platform.wakeup = jest.fn();
+  
+      getSettings = () => ({
+        alertOnCollision: true,
+        onlyTagsCanDisable: true,
+        tags: ['tag1', 'tag2'],
+      });
+  
+      loadScript();
+      messages.emit('onInit');
+      messages.emit('onEvent', new MockShakeEvent());    
+      expect(platform.setUrgentNotification).toHaveBeenCalledTimes(1);
+  
+      messages.emit('onCall', 'ok', {});
+      expect(platform.setUrgentNotification).toBeCalledWith(null);
+    });
+
+    it('keeps showing notification if no user logged in', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+        logout: jest.fn()
+      };
+      platform.setUrgentNotification = jest.fn();
+      platform.wakeup = jest.fn();
+  
+      getSettings = () => ({
+        alertOnCollision: true,
+        onlyTagsCanDisable: true,
+        tags: ['tag1', 'tag2'],
+      });
+  
+      loadScript();
+      messages.emit('onInit');
+      messages.emit('onEvent', new MockShakeEvent());    
+      expect(platform.setUrgentNotification).toHaveBeenCalledTimes(1);
+  
+      messages.emit('onCall', 'ok', {});
+      expect(platform.setUrgentNotification).not.toBeCalledWith(null);
+    });
+    
+    it('keeps showing notification if user logged in but has no tags', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+        logout: jest.fn(),
+        currentLogin: {
+          maybeCurrent: {
+            $modelId: 'TEST',
+            tags: []
+          }
+        },
+        logins: [{
+          $modelId: 'TEST',
+          tags: []
+        }]
+      };
+      platform.setUrgentNotification = jest.fn();
+      platform.wakeup = jest.fn();
+  
+      getSettings = () => ({
+        alertOnCollision: true,
+        onlyTagsCanDisable: true,
+        tags: ['tag1', 'tag2'],
+      });
+  
+      loadScript();
+      messages.emit('onInit');
+      messages.emit('onEvent', new MockShakeEvent());    
+      expect(platform.setUrgentNotification).toHaveBeenCalledTimes(1);
+  
+      messages.emit('onCall', 'ok', {});
+      expect(platform.setUrgentNotification).not.toBeCalledWith(null);
+    });
+
+    it('keeps showing notification if user logged in but has no tags that match', () => {
+      (env.project as any) = {
+        saveEvent: jest.fn(),
+        logout: jest.fn(),
+        currentLogin: {
+          maybeCurrent: {
+            $modelId: 'TEST',
+            tags: ['tag1', 'tag2']
+          }
+        },
+        logins: [{
+          $modelId: 'TEST',
+          tags: ['tag1', 'tag2']
+        }]
+      };
+      platform.setUrgentNotification = jest.fn();
+      platform.wakeup = jest.fn();
+  
+      getSettings = () => ({
+        alertOnCollision: true,
+        onlyTagsCanDisable: true,
+        tags: ['tag100', 'tag200'],
+      });
+  
+      loadScript();
+      messages.emit('onInit');
+      messages.emit('onEvent', new MockShakeEvent());    
+      expect(platform.setUrgentNotification).toHaveBeenCalledTimes(1);
+  
+      messages.emit('onCall', 'ok', {});
+      expect(platform.setUrgentNotification).not.toBeCalledWith(null);
+    });
+  });
 });

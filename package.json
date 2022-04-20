@@ -117,6 +117,35 @@
         "defaultValue": false
       },
       {
+        "label": "Só permitir desativar alarme para tags especificos?",
+        "tableView": false,
+        "key": "onlyTagsCanDisable",
+        "type": "checkbox",
+        "conditional": {
+          "show": true,
+          "when": "alertOnCollision",
+          "eq": "true"
+        },
+        "input": true,
+        "defaultValue": false
+      },
+      {
+        "label": "Tags",
+        "tableView": false,
+        "storeas": "array",
+        "validate": {
+          "required": true
+        },
+        "key": "tags",
+        "conditional": {
+          "show": true,
+          "when": "onlyTagsCanDisable",
+          "eq": "true"
+        },
+        "type": "tags",
+        "input": true
+      },
+      {
         "label": "Filtrar usando IA analizadora de som",
         "tableView": false,
         "defaultValue": false,

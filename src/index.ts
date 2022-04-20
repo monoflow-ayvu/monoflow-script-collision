@@ -1,4 +1,5 @@
 import * as MonoUtils from "@fermuch/monoutils";
+import { currentLogin } from "@fermuch/monoutils";
 
 // based on settingsSchema @ package.json
 export type Config = {
@@ -10,12 +11,15 @@ export type Config = {
   lockOnCollision: boolean;
   alertOnCollision: boolean;
 
+  onlyTagsCanDisable: boolean;
+  tags: string[];
+
   enableAudio: boolean;
   totalSoundKeywords: number;
   filters: {
     category: string;
     minimum: number;
-  }[]
+  }[];
 }
 
 const conf = new MonoUtils.config.Config<Config>();
@@ -146,7 +150,30 @@ MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
 });
 
 messages.on('onCall', (name: string, args: unknown) => {
-  if (name === 'ok') {
-    setUrgentNotification(null);
+  if (name !== 'ok') return;
+
+  if (conf.get('onlyTagsCanDisable', false)) {
+    if (!currentLogin()) {
+      // no login, notification keeps showing
+      return;
+    }
+
+    const validTags = conf.get('tags', []);
+    const user = env.project?.logins?.find((l) => l.$modelId === currentLogin());
+    if (!user) {
+      // no user, notification keeps showing
+      return;
+    }
+
+    if (!user.tags.some((t) => validTags.includes(t))) {
+      // user has no valid tag, notification keeps showing
+      return;
+    }
+
+    // user has a valid tag, notification is dismissed
+    return setUrgentNotification(null);
   }
+
+  // by default remove notification
+  setUrgentNotification(null);
 })
