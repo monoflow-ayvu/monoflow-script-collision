@@ -1,98 +1,12 @@
 import * as MonoUtils from "@fermuch/monoutils";
 import { currentLogin } from "@fermuch/monoutils";
+import { handleDataCollection, handleUserInteraction, shouldBeDataCollection } from "./collection_mode";
+import { conf } from "./config";
+import { LockEvent, ShakeEvent } from "./events";
+import { setUrgentNotification, wakeup } from "./utils";
 
-// based on settingsSchema @ package.json
-export type Config = {
-  maxSamples: number;
-  minTimeBetweenSamplesMs: number;
-  visibleTimeRangeMs: number;
-  magnitudeThreshold: number;
-  percentOverThresholdForShake: number;
-  lockOnCollision: boolean;
-  alertOnCollision: boolean;
 
-  onlyTagsCanDisable: boolean;
-  tags: string[];
-
-  enableDataCollection: boolean;
-  // IDs can be:
-  // - device id
-  // - login id
-  // - device tag
-  // - login tag
-  // Empty string means all devices
-  dataCollectionIds: string[];
-
-  enableAudio: boolean;
-  totalSoundKeywords: number;
-  filters: {
-    category: string;
-    minimum: number;
-  }[];
-}
-
-const conf = new MonoUtils.config.Config<Config>();
 const IS_DEVICE_LOCKED_KEY = 'IS_DEVICE_LOCKED' as const;
-
-class LockEvent extends MonoUtils.wk.event.BaseEvent {
-  kind = 'critical-lock' as const;
-
-  constructor(public readonly isLocked: boolean) {
-    super();
-  }
-
-  getData() {
-    return {
-      locked: this.isLocked,
-      unlocked: !this.isLocked,
-      isLocked: this.isLocked,
-    };
-  }
-}
-
-declare class ShakeEvent extends MonoUtils.wk.event.BaseEvent {
-  kind: 'shake-event';
-  getData(): { percentOverThreshold: number, classifications: Record<string, number> };
-}
-
-function wakeup() {
-  if ('wakeup' in platform) {
-    (platform as unknown as { wakeup: () => void }).wakeup();
-  }
-}
-
-interface Action {
-  name: string;
-  action: string;
-  payload: unknown;
-}
-
-type UrgentNotification = {
-  title: string;
-  message?: string;
-  color?: string;
-  actions?: Action[];
-  urgent?: boolean;
-} | null;
-
-function setUrgentNotification(notification: UrgentNotification) {
-  if (!('setUrgentNotification' in platform)) {
-    return;
-  }
-
-  if (notification !== null) {
-    wakeup();
-  }
-  (platform as unknown as { setUrgentNotification: (notification: UrgentNotification) => void }).setUrgentNotification(notification);
-}
-
-function getUrgentNotification(): UrgentNotification | null {
-  if (!('getUrgentNotification' in platform)) {
-    return null;
-  }
-
-  return (platform as unknown as { getUrgentNotification: () => UrgentNotification | null }).getUrgentNotification();
-}
 
 messages.on('onInit', function () {
   platform.log('collision script started');
@@ -109,6 +23,12 @@ messages.on('onInit', function () {
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
   const eventClasses = ev.getData().classifications || {};
+
+  if (shouldBeDataCollection()) {
+    handleDataCollection(ev);
+    // event handled by data collection
+    return;
+  }
 
   let validations: {category: string; level: number}[] = [];
   if (conf.get('enableAudio', false)) {
@@ -159,6 +79,10 @@ MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
 });
 
 messages.on('onCall', (name: string, args: unknown) => {
+  if (handleUserInteraction(name, args)) {
+    return;
+  }
+
   if (name !== 'ok') return;
 
   if (conf.get('onlyTagsCanDisable', false)) {
