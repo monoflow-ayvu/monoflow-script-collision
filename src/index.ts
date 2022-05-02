@@ -1,6 +1,6 @@
 import * as MonoUtils from "@fermuch/monoutils";
 import { currentLogin } from "@fermuch/monoutils";
-import { handleDataCollection, handleUserInteraction, shouldBeDataCollection } from "./collection_mode";
+import { handleDataCollection, handlePeriodic, handleUserInteraction, shouldBeDataCollection } from "./collection_mode";
 import { conf } from "./config";
 import { LockEvent, ShakeEvent } from "./events";
 import { setUrgentNotification, wakeup } from "./utils";
@@ -20,6 +20,10 @@ messages.on('onInit', function () {
   env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
   env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', Boolean(conf.get('enableAudio', false)));
 });
+
+messages.on('onPeriodic', function () {
+  handlePeriodic();
+})
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
   const eventClasses = ev.getData().classifications || {};

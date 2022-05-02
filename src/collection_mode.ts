@@ -1,7 +1,7 @@
 import { currentLogin, myID } from "@fermuch/monoutils";
 import { conf } from "./config";
 import { ShakeEvent, ShakeEventClassification } from "./events";
-import { setUrgentNotification, wakeup } from "./utils";
+import { getUrgentNotification, setUrgentNotification, wakeup } from "./utils";
 
 // store of pending to send events
 const pendingEvents: ShakeEventClassification[] = [];
@@ -59,6 +59,17 @@ export function shouldBeDataCollection() {
   }
 
   return false;
+}
+
+export function handlePeriodic() {
+  if (pendingEvents.length > 0) {
+    wakeup();
+
+    const currentNotif = getUrgentNotification()
+    if (!currentNotif) {
+      showPendingClassificationToUser(pendingEvents[0]);
+    }
+  }
 }
 
 export function handleDataCollection(ev: ShakeEvent) {
