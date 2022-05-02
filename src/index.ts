@@ -14,6 +14,15 @@ export type Config = {
   onlyTagsCanDisable: boolean;
   tags: string[];
 
+  enableDataCollection: boolean;
+  // IDs can be:
+  // - device id
+  // - login id
+  // - device tag
+  // - login tag
+  // Empty string means all devices
+  dataCollectionIds: string[];
+
   enableAudio: boolean;
   totalSoundKeywords: number;
   filters: {

@@ -146,6 +146,31 @@
         "input": true
       },
       {
+        "label": "Ativar modo recolher dados",
+        "tooltip": "O modo recolher dados não gera eventos. Só recolhe eventos de colisão, apresenta eles para o(s) operador(es) e pergunta para eles se a colisão foi um evento severo ou não.",
+        "tableView": false,
+        "key": "enableDataCollection",
+        "type": "checkbox",
+        "input": true,
+        "defaultValue": false
+      },
+      {
+        "label": "ID de operadores para modo recolher",
+        "placeholder": "Todos os dispositivos",
+        "description": "Padrão (nada) significa ativar para todos os dispositivos.",
+        "tooltip": "IDs de dispositivo, id de login (chave), ou tag (dispositivo ou login) para ativar o modo recolher dados.",
+        "tableView": false,
+        "storeas": "array",
+        "key": "dataCollectionIds",
+        "conditional": {
+          "show": true,
+          "when": "enableDataCollection",
+          "eq": "true"
+        },
+        "type": "tags",
+        "input": true
+      },
+      {
         "label": "Filtrar usando IA analizadora de som",
         "tableView": false,
         "defaultValue": false,
