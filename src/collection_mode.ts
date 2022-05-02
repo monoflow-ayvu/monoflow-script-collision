@@ -91,11 +91,18 @@ export function handleUserInteraction(name: string, args: unknown): boolean {
 
   const classification = pendingEvents.shift();
   if (!classification) {
-    return false;
+    setUrgentNotification(null);
+    return true;
   }
 
   classification.setCollision(name === 'isCritical');
   env.project?.saveEvent(classification);
+
+  if (pendingEvents.length > 0) {
+    showPendingClassificationToUser(pendingEvents[0]);
+  } else {
+    setUrgentNotification(null);
+  }
 
   return true;
 }
