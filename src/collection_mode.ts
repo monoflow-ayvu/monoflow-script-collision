@@ -23,7 +23,7 @@ function showPendingClassificationToUser(ev: ShakeEventClassification) {
       action: 'isCritical',
       payload: {},
     }],
-    urgent: false,
+    urgent: true,
   });
   wakeup();
 }
