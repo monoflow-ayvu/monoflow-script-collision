@@ -11,7 +11,7 @@ specifiers:
   '@size-limit/preset-big-lib': 8.1.0
   '@types/commander': 2.12.2
   '@types/firebase': 3.2.1
-  '@types/jest': 29.0.3
+  '@types/jest': 29.1.0
   '@types/lodash': 4.14.186
   '@types/uuid': 8.3.4
   babel-loader: 8.2.5
@@ -52,7 +52,7 @@ devDependencies:
   '@size-limit/preset-big-lib': 8.1.0_4a68b21bd94cc89fa08925c3df8af095
   '@types/commander': 2.12.2
   '@types/firebase': 3.2.1
-  '@types/jest': 29.0.3
+  '@types/jest': 29.1.0
   '@types/lodash': 4.14.186
   '@types/uuid': 8.3.4
   babel-loader: 8.2.5_b1475583497452e4eb6a502a776a8f19
@@ -2348,11 +2348,11 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/29.0.3:
-    resolution: {integrity: sha512-F6ukyCTwbfsEX5F2YmVYmM5TcTHy1q9P5rWlRbrk56KyMh3v9xRGUO3aa8+SkvMi0SHXtASJv1283enXimC0Og==}
+  /@types/jest/29.1.0:
+    resolution: {integrity: sha512-CqlKkMNaUhFSRvqVKniNhbcy9fc/Rj2cmFD5t8Jtu4HlHzSit27h7XKfP5kkxBeROQ8WAvQQmy93FIz9or8jKg==}
     dependencies:
-      expect: 29.0.3
-      pretty-format: 29.0.3
+      expect: 29.1.0
+      pretty-format: 29.1.0
     dev: true
 
   /@types/json-schema/7.0.11:
@@ -3653,17 +3653,6 @@ packages:
     engines: {node: '>=6'}
     dev: true
     optional: true
-
-  /expect/29.0.3:
-    resolution: {integrity: sha512-t8l5DTws3212VbmPL+tBFXhjRHLmctHB0oQbL8eUc6S7NzZtYUhycrFO9mkxA0ZUC6FAWdNi7JchJSkODtcu1Q==}
-    engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
-    dependencies:
-      '@jest/expect-utils': 29.1.0
-      jest-get-type: 29.0.0
-      jest-matcher-utils: 29.1.0
-      jest-message-util: 29.1.0
-      jest-util: 29.1.0
-    dev: true
 
   /expect/29.1.0:
     resolution: {integrity: sha512-1NCfR0FEArn9Vq1KEjhPd1rggRLiWgo87gfMK4iKn6DcVzJBRMyDNX22hyND5KiSRPIPQ5KtsY6HLxsQ0MU86w==}
@@ -5477,15 +5466,6 @@ packages:
       which-pm-runs: 1.1.0
     dev: true
     optional: true
-
-  /pretty-format/29.0.3:
-    resolution: {integrity: sha512-cHudsvQr1K5vNVLbvYF/nv3Qy/F/BcEKxGuIeMiVMRHxPOO1RxXooP8g/ZrwAp7Dx+KdMZoOc7NxLHhMrP2f9Q==}
-    engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
-    dependencies:
-      '@jest/schemas': 29.0.0
-      ansi-styles: 5.2.0
-      react-is: 18.0.0
-    dev: true
 
   /pretty-format/29.1.0:
     resolution: {integrity: sha512-dZ21z0UjKVSiEkrPAt2nJnGfrtYMFBlNW4wTkJsIp9oB5A8SUQ8DuJ9EUgAvYyNfMeoGmKiDnpJvM489jkzdSQ==}
