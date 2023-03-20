@@ -26,6 +26,10 @@ messages.on('onPeriodic', function () {
 })
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
+  if (!ev.getData()?.percentOverThreshold) {
+    return;
+  }
+
   const eventClasses = ev.getData().classifications || {};
 
   if (shouldBeDataCollection()) {
