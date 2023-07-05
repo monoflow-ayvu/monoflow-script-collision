@@ -117,6 +117,18 @@
         "defaultValue": false
       },
       {
+        "label": "Tags ignorados",
+        "tooltip": "Se o dispositivo ou o login tiver algum dessas tags, o script **não** vai se ativar",
+        "tableView": false,
+        "storeas": "array",
+        "validate": {
+          "required": false
+        },
+        "key": "ignoredTags",
+        "type": "tags",
+        "input": true
+      },
+      {
         "label": "Só permitir desativar alarme para tags especificos?",
         "tableView": false,
         "key": "onlyTagsCanDisable",

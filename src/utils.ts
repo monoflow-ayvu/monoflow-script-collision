@@ -1,3 +1,5 @@
+import { currentLogin, myID } from "@fermuch/monoutils";
+
 export function wakeup() {
   if ('wakeup' in platform) {
     (platform as unknown as { wakeup: () => void }).wakeup();
@@ -35,4 +37,24 @@ export function getUrgentNotification(): UrgentNotification | null {
   }
 
   return (platform as unknown as { getUrgentNotification: () => UrgentNotification | null }).getUrgentNotification();
+}
+
+
+function getMyTags(loginId) {
+  const loginName = loginId || currentLogin() || '';
+  const userTags = env.project?.logins?.find((login) => login.key === loginName || login.$modelId === loginName)?.tags || [];
+  const deviceTags = env.project?.usersManager?.users?.find?.((u) => u.$modelId === myID())?.tags || [];
+  const allTags = [...userTags, ...deviceTags];
+
+  return allTags;
+}
+
+export function anyTagMatches(tags: string[], loginId?: string): boolean {
+  // we never match if there are no tags
+  if (!tags || tags.length === 0) return false;
+
+  const loginName = loginId || currentLogin() || '';
+  const allTags = getMyTags(loginName);
+
+  return tags.some((t) => allTags.includes(t));
 }

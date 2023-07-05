@@ -63,6 +63,34 @@ describe("onInit", () => {
     expect(env.data.ACCELEROMETER_USE_AUDIO_DETECTOR).toBe(false);
   });
 
+  it('does NOT set accelerometer config if device is ignored', () => {
+    (env.project as any) = {
+      saveEvent: jest.fn(),
+      logout: jest.fn(),
+      currentLogin: {
+        maybeCurrent: {
+          $modelId: 'TEST',
+          tags: ['disable']
+        }
+      },
+      logins: [{
+        $modelId: 'TEST',
+        tags: ['disable']
+      }]
+    };
+    getSettings = () => ({
+      ignoredTags: ["disable"]
+    });
+    loadScript();
+    messages.emit('onInit');
+
+    expect(env.data.ACCELEROMETER_MAX_SAMPLES).toBe(null);
+    expect(env.data.ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS).toBe(null);
+    expect(env.data.ACCELEROMETER_VISIBLE_TIME_RANGE_MS).toBe(null);
+    expect(env.data.ACCELEROMETER_MAGNITUDE_THRESHOLD).toBe(null);
+    expect(env.data.ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE).toBe(null);
+  });
+
   it('stores event on shake-event', () => {
     (env.project as any) = {
       saveEvent: jest.fn()

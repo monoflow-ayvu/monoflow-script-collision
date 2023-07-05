@@ -13,6 +13,7 @@ export type Config = {
 
   onlyTagsCanDisable: boolean;
   tags: string[];
+  ignoredTags: string[];
 
   enableDataCollection: boolean;
   // IDs can be:

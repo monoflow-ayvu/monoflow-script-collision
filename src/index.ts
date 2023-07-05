@@ -3,22 +3,27 @@ import { currentLogin } from "@fermuch/monoutils";
 import { handleDataCollection, handlePeriodic, handleUserInteraction, shouldBeDataCollection } from "./collection_mode";
 import { conf } from "./config";
 import { LockEvent, ShakeEvent } from "./events";
-import { setUrgentNotification, wakeup } from "./utils";
+import { anyTagMatches, setUrgentNotification, wakeup } from "./utils";
 
 
 const IS_DEVICE_LOCKED_KEY = 'IS_DEVICE_LOCKED' as const;
 
 messages.on('onInit', function () {
-  platform.log('collision script started');
-  platform.log('settings:');
-  platform.log(conf.store);
-
-  env.setData('ACCELEROMETER_MAX_SAMPLES', conf.get('maxSamples', 25));
-  env.setData('ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS', conf.get('minTimeBetweenSamplesMs', 20));
-  env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', conf.get('visibleTimeRangeMs', 500));
-  env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', conf.get('magnitudeThreshold', 25));
-  env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
-  env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', Boolean(conf.get('enableAudio', false)));
+  if (anyTagMatches(conf.get('ignoredTags', []))) {
+    env.setData('ACCELEROMETER_MAX_SAMPLES', null);
+    env.setData('ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS', null);
+    env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', null);
+    env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', null);
+    env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', null);
+    env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', null);
+  } else {
+    env.setData('ACCELEROMETER_MAX_SAMPLES', conf.get('maxSamples', 25));
+    env.setData('ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS', conf.get('minTimeBetweenSamplesMs', 20));
+    env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', conf.get('visibleTimeRangeMs', 500));
+    env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', conf.get('magnitudeThreshold', 25));
+    env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
+    env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', Boolean(conf.get('enableAudio', false)));
+  }
 });
 
 messages.on('onPeriodic', function () {
@@ -27,6 +32,10 @@ messages.on('onPeriodic', function () {
 
 MonoUtils.wk.event.subscribe<ShakeEvent>('shake-event', (ev) => {
   if (!ev.getData()?.percentOverThreshold) {
+    return;
+  }
+
+  if (anyTagMatches(conf.get('ignoredTags', []))) {
     return;
   }
 
