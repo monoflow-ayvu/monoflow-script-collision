@@ -10,20 +10,24 @@ const IS_DEVICE_LOCKED_KEY = 'IS_DEVICE_LOCKED' as const;
 
 messages.on('onInit', function () {
   if (anyTagMatches(conf.get('ignoredTags', []))) {
-    env.setData('ACCELEROMETER_MAX_SAMPLES', null);
-    env.setData('ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS', null);
-    env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', null);
-    env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', null);
-    env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', null);
-    env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', null);
-  } else {
-    env.setData('ACCELEROMETER_MAX_SAMPLES', conf.get('maxSamples', 25));
-    env.setData('ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS', conf.get('minTimeBetweenSamplesMs', 20));
-    env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', conf.get('visibleTimeRangeMs', 500));
-    env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', conf.get('magnitudeThreshold', 25));
-    env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
-    env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', Boolean(conf.get('enableAudio', false)));
+    try {
+      delete env.data.ACCELEROMETER_MAX_SAMPLES;
+      delete env.data.ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS;
+      delete env.data.ACCELEROMETER_VISIBLE_TIME_RANGE_MS;
+      delete env.data.ACCELEROMETER_MAGNITUDE_THRESHOLD;
+      delete env.data.ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE;
+    } catch {
+      /* pass */
+    }
+    return;
   }
+
+  env.setData('ACCELEROMETER_MAX_SAMPLES', conf.get('maxSamples', 25));
+  env.setData('ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS', conf.get('minTimeBetweenSamplesMs', 20));
+  env.setData('ACCELEROMETER_VISIBLE_TIME_RANGE_MS', conf.get('visibleTimeRangeMs', 500));
+  env.setData('ACCELEROMETER_MAGNITUDE_THRESHOLD', conf.get('magnitudeThreshold', 25));
+  env.setData('ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE', conf.get('percentOverThresholdForShake', 66));
+  env.setData('ACCELEROMETER_USE_AUDIO_DETECTOR', Boolean(conf.get('enableAudio', false)));
 });
 
 messages.on('onPeriodic', function () {

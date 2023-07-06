@@ -84,11 +84,11 @@ describe("onInit", () => {
     loadScript();
     messages.emit('onInit');
 
-    expect(env.data.ACCELEROMETER_MAX_SAMPLES).toBe(null);
-    expect(env.data.ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS).toBe(null);
-    expect(env.data.ACCELEROMETER_VISIBLE_TIME_RANGE_MS).toBe(null);
-    expect(env.data.ACCELEROMETER_MAGNITUDE_THRESHOLD).toBe(null);
-    expect(env.data.ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE).toBe(null);
+    expect(env.data.ACCELEROMETER_MAX_SAMPLES).toBeUndefined();
+    expect(env.data.ACCELEROMETER_MIN_TIME_BETWEEN_SAMPLES_MS).toBeUndefined();
+    expect(env.data.ACCELEROMETER_VISIBLE_TIME_RANGE_MS).toBeUndefined();
+    expect(env.data.ACCELEROMETER_MAGNITUDE_THRESHOLD).toBeUndefined();
+    expect(env.data.ACCELEROMETER_PERCENT_OVER_THRESHOLD_FOR_SHAKE).toBeUndefined();
   });
 
   it('stores event on shake-event', () => {
